@@ -12,7 +12,7 @@ import {
 } from './styles'
 import { NewCycleForm } from './components/newCycleForm'
 import { Countdown } from './components/countdown'
-import { CycleContext } from '../../contexts/cycleContext'
+import { CyclesContext } from '../../contexts/cycleContext'
 
 const newCycleFormValidationSchema = zod.object({
   task: zod.string().min(1, 'Informe a tarefa'),
@@ -26,7 +26,7 @@ type NewCycleFormData = zod.infer<typeof newCycleFormValidationSchema>
 
 export function Home() {
   const { activeCycle, createNewCycle, interruptCurrentCycle } =
-    useContext(CycleContext)
+    useContext(CyclesContext)
 
   const newCycleForm = useForm<NewCycleFormData>({
     resolver: zodResolver(newCycleFormValidationSchema),

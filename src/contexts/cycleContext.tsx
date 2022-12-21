@@ -19,9 +19,9 @@ interface CreateCycleData {
   minutesAmount: number
 }
 
-interface CycleContextData {
+interface CyclesContextType {
   cycles: Cycle[]
-  activeCycle?: Cycle
+  activeCycle: Cycle | undefined
   activeCycleId: string | null
   amountSecondsPassed: number
   markCurrentCycleAsFinished: () => void
@@ -30,13 +30,15 @@ interface CycleContextData {
   interruptCurrentCycle: () => void
 }
 
-export const CycleContext = createContext({} as CycleContextData)
+export const CyclesContext = createContext({} as CyclesContextType)
 
-interface CycleContextProviderProps {
+interface CyclesContextProviderProps {
   children: ReactNode
 }
 
-export function CycleContextProvider({ children }: CycleContextProviderProps) {
+export function CyclesContextProvider({
+  children,
+}: CyclesContextProviderProps) {
   const [cyclesState, dispatch] = useReducer(
     cyclesReducer,
     {
@@ -50,6 +52,11 @@ export function CycleContextProvider({ children }: CycleContextProviderProps) {
 
       if (storedStateAsJSON) {
         return JSON.parse(storedStateAsJSON)
+      } else {
+        return {
+          cycles: [],
+          activeCycleId: null,
+        }
       }
     },
   )
@@ -79,12 +86,8 @@ export function CycleContextProvider({ children }: CycleContextProviderProps) {
     dispatch(markCurrentCycleAsFinishedAction())
   }
 
-  function interruptCurrentCycle() {
-    dispatch(interruptCurrentCycleAction())
-  }
-
   function createNewCycle(data: CreateCycleData) {
-    const id = new Date().getTime().toString()
+    const id = String(new Date().getTime())
 
     const newCycle: Cycle = {
       id,
@@ -98,8 +101,12 @@ export function CycleContextProvider({ children }: CycleContextProviderProps) {
     setAmountSecondsPassed(0)
   }
 
+  function interruptCurrentCycle() {
+    dispatch(interruptCurrentCycleAction())
+  }
+
   return (
-    <CycleContext.Provider
+    <CyclesContext.Provider
       value={{
         cycles,
         activeCycle,
@@ -112,6 +119,6 @@ export function CycleContextProvider({ children }: CycleContextProviderProps) {
       }}
     >
       {children}
-    </CycleContext.Provider>
+    </CyclesContext.Provider>
   )
 }
